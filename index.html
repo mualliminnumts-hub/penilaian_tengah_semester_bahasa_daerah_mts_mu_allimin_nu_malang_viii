@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PTS Bahasa Daerah - MTs. Mu'allimin NU Kota Malang</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade { animation: fadeIn 0.3s ease-out forwards; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-100 min-h-full text-slate-800 flex flex-col justify-between">
+
+    <div id="app" class="flex-grow flex flex-col">
+        <!-- Header Banner -->
+        <header class="bg-emerald-800 text-white shadow-lg sticky top-0 z-50">
+            <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <div id="headerLogoContainer" class="w-11 h-11 bg-white/10 rounded-xl flex items-center justify-center text-emerald-200 font-bold text-xl border border-emerald-600">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-base md:text-lg tracking-tight" id="headerSchoolName">MTs. Mu'allimin NU Kota Malang</h1>
+                        <p class="text-xs text-emerald-200">Penilaian Tengah Semester (PTS) Bahasa Daerah - Kelas VIII</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span id="badgeAuthor" class="hidden md:inline-block text-xs bg-emerald-900/60 text-emerald-200 px-3 py-1 rounded-full border border-emerald-700">
+                        Penyusun: H. Matwaffi
+                    </span>
+                    <div id="userProfileBadge" class="hidden flex items-center gap-2 bg-emerald-700/60 px-3 py-1.5 rounded-xl border border-emerald-600 text-xs">
+                        <i class="fa-solid fa-user-circle text-emerald-300"></i>
+                        <span id="navUserName" class="font-semibold text-white"></span>
+                        <button onclick="handleLogout()" class="ml-2 text-emerald-200 hover:text-white transition" title="Keluar">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Dynamic Container -->
+        <main class="flex-grow max-w-6xl w-full mx-auto p-4 md:p-6 flex items-center justify-center">
+            
+            <!-- VIEW: LOGIN PAGE -->
+            <div id="viewLogin" class="w-full max-w-md animate-fade">
+                <div class="glass-panel p-8 rounded-3xl shadow-xl border border-emerald-100 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-emerald-500 to-teal-600"></div>
+                    <div class="text-center mb-6">
+                        <div class="inline-flex w-16 h-16 bg-emerald-100 text-emerald-700 rounded-2xl items-center justify-center text-2xl mb-3 shadow-inner">
+                            <i class="fa-solid fa-book-open-reader"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-emerald-900">Login Asesmen</h2>
+                        <p class="text-xs text-slate-500 mt-1">Silakan masuk menggunakan akun Siswa atau Administrator</p>
+                    </div>
+
+                    <!-- Role Switcher Tabs -->
+                    <div class="flex bg-slate-100 p-1.5 rounded-xl mb-6">
+                        <button onclick="switchLoginTab('siswa')" id="tabSiswa" class="flex-1 py-2 text-xs font-bold rounded-lg transition bg-white text-emerald-800 shadow-sm">
+                            <i class="fa-solid fa-user-graduate mr-1"></i> Siswa
+                        </button>
+                        <button onclick="switchLoginTab('admin')" id="tabAdmin" class="flex-1 py-2 text-xs font-bold rounded-lg transition text-slate-600 hover:text-emerald-800">
+                            <i class="fa-solid fa-user-shield mr-1"></i> Admin / Guru
+                        </button>
+                    </div>
+
+                    <!-- Siswa Form -->
+                    <form id="formSiswa" onsubmit="handleLoginSiswa(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Nama Lengkap Siswa</label>
+                            <input type="text" id="siswaNama" required placeholder="Contoh: Ahmad Fauzi" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:border-emerald-500 text-sm bg-slate-50/50">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Kelas</label>
+                            <select id="siswaKelas" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:border-emerald-500 text-sm bg-slate-50/50">
+                                <option value="">-- Pilih Kelas --</option>
+                                <option value="VII A">VII A</option>
+                                <option value="VII B">VII B</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Nomor Presensi (Digunakan sebagai Password)</label>
+                            <input type="password" id="siswaPresensi" required placeholder="Contoh: 12" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:border-emerald-500 text-sm bg-slate-50/50">
+                        </div>
+                        <button type="submit" class="w-full py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl transition shadow-lg shadow-emerald-700/20 text-sm">
+                            Masuk & Mulai Ujian <i class="fa-solid fa-arrow-right ml-1"></i>
+                        </button>
+                    </form>
+
+                    <!-- Admin Form -->
+                    <form id="formAdmin" onsubmit="handleLoginAdmin(event)" class="space-y-4 hidden">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Username Admin</label>
+                            <input type="text" id="adminUser" required placeholder="Username standar" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:border-emerald-500 text-sm bg-slate-50/50">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Password Admin</label>
+                            <input type="password" id="adminPass" required placeholder="Password standar" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:border-emerald-500 text-sm bg-slate-50/50">
+                        </div>
+                        <button type="submit" class="w-full py-3 bg-teal-700 hover:bg-teal-800 text-white font-bold rounded-xl transition shadow-lg shadow-teal-700/20 text-sm">
+                            Masuk Dashboard Admin <i class="fa-solid fa-shield-halved ml-1"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- VIEW: DASHBOARD SISWA -->
+            <div id="viewSiswaDashboard" class="w-full max-w-2xl hidden animate-fade">
+                <div class="glass-panel p-8 rounded-3xl shadow-xl border border-emerald-100 space-y-6">
+                    <div class="border-b border-slate-100 pb-4 flex justify-between items-start">
+                        <div>
+                            <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full uppercase tracking-wider">Selamat Datang</span>
+                            <h2 id="welcomeSiswaName" class="text-2xl font-bold text-slate-900 mt-2"></h2>
+                            <p class="text-xs text-slate-500 mt-0.5">Kelas: <span id="welcomeSiswaKelas" class="font-semibold text-slate-700"></span> | No. Presensi: <span id="welcomeSiswaPresensi" class="font-semibold text-slate-700"></span></p>
+                        </div>
+                        <div class="bg-emerald-50 text-emerald-800 p-3 rounded-2xl text-center">
+                            <div class="text-xs font-medium">KKM</div>
+                            <div class="text-xl font-bold">80</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200/60 space-y-3">
+                        <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-circle-info text-emerald-600"></i> Ketentuan Ujian PTS Bahasa Daerah Kelas VIII
+                        </h3>
+                        <ul class="text-xs text-slate-600 space-y-2 list-disc list-inside">
+                            <li>Materi meliputi: <strong>Cerita Cekak, Narasi, dan Aksara Jawa</strong>.</li>
+                            <li>Jumlah soal: 35 soal (15 Pilihan Ganda, 15 Pilihan Ganda Kompleks, 5 Menjodohkan).</li>
+                            <li>Waktu pengerjaan: <strong>90 Menit</strong>.</li>
+                            <li>Kesempatan pengerjaan dibatasi maksimal <strong>3 kali</strong> kesempatan.</li>
+                            <li>Nilai minimal kelulusan (KKM) adalah <strong>80</strong>.</li>
+                        </ul>
+                    </div>
+
+                    <div id="attemptStatusContainer" class="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-2xl text-xs flex justify-between items-center">
+                        <div>
+                            <span class="font-bold">Riwayat Percobaan:</span> Anda telah mengerjakan <span id="currentAttemptCount" class="font-bold">0</span> dari 3 kesempatan.
+                        </div>
+                        <div id="lastScoreDisplay" class="font-bold"></div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button id="btnMulaiUjian" onclick="startExam()" class="flex-1 py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-2xl transition shadow-lg shadow-emerald-700/20 text-sm flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-play"></i> Mulai Mengerjakan Soal
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: EXAM ROOM -->
+            <div id="viewExamRoom" class="w-full max-w-4xl hidden animate-fade space-y-4">
+                <!-- Exam Top Bar / Timer -->
+                <div class="glass-panel p-4 rounded-2xl shadow-md border border-emerald-100 flex justify-between items-center sticky top-16 z-40">
+                    <div>
+                        <div class="text-xs text-slate-500">Soal No. <span id="currentQuestionNum" class="font-bold text-emerald-800 text-sm">1</span> dari 35</div>
+                        <div class="text-xs font-semibold text-slate-700" id="currentQuestionTypeTag">Pilihan Ganda</div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 shadow-inner">
+                            <i class="fa-solid fa-clock"></i>
+                            <span id="examTimer">90:00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question Card -->
+                <div class="glass-panel p-6 md:p-8 rounded-3xl shadow-xl border border-emerald-100 space-y-6">
+                    <div id="questionContainer" class="space-y-4">
+                        <!-- Dynamic Question Content -->
+                    </div>
+
+                    <!-- Navigation Footer -->
+                    <div class="flex justify-between items-center pt-4 border-t border-slate-100">
+                        <button onclick="navigateQuestion(-1)" id="btnPrev" class="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-bold transition disabled:opacity-40">
+                            <i class="fa-solid fa-chevron-left mr-1"> Sebelumnya</i>
+                        </button>
+                        <div class="flex gap-2 overflow-x-auto max-w-xs md:max-w-md py-1" id="questionNumberPagination">
+                            <!-- Pagination Dots -->
+                        </div>
+                        <button onclick="navigateQuestion(1)" id="btnNext" class="px-5 py-2.5 rounded-xl bg-emerald-700 text-white hover:bg-emerald-800 text-xs font-bold transition shadow-md shadow-emerald-700/20">
+                            Selanjutnya <i class="fa-solid fa-chevron-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: EXAM RESULT -->
+            <div id="viewExamResult" class="w-full max-w-2xl hidden animate-fade">
+                <div class="glass-panel p-8 rounded-3xl shadow-xl border border-emerald-100 text-center space-y-6">
+                    <div id="resultIcon" class="w-20 h-20 rounded-3xl mx-auto flex items-center justify-center text-3xl shadow-lg">
+                        <!-- Dynamic Icon -->
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-900">Hasil Asesmen PTS</h2>
+                        <p class="text-xs text-slate-500 mt-1" id="resultSubtitle">Evaluasi Kompetensi Bahasa Daerah</p>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200/60">
+                        <div class="bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
+                            <div class="text-xs text-slate-500">Nilai Akhir</div>
+                            <div id="resFinalScore" class="text-2xl font-bold text-emerald-800 mt-1">0</div>
+                        </div>
+                        <div class="bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
+                            <div class="text-xs text-slate-500">KKM</div>
+                            <div class="text-2xl font-bold text-slate-800 mt-1">80</div>
+                        </div>
+                        <div class="bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
+                            <div class="text-xs text-slate-500">Status</div>
+                            <div id="resStatus" class="text-sm font-bold mt-2">--</div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 pt-2">
+                        <button onclick="downloadPDFCertificate()" class="flex-1 py-3 bg-teal-700 hover:bg-teal-800 text-white font-bold rounded-xl transition shadow-lg shadow-teal-700/20 text-xs flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-download"></i> Download Hasil (PDF)
+                        </button>
+                        <button onclick="returnToDashboard()" class="px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl transition text-xs">
+                            Kembali ke Menu
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: ADMIN DASHBOARD -->
+            <div id="viewAdminDashboard" class="w-full max-w-6xl hidden animate-fade space-y-6">
+                <!-- Admin Header & Actions -->
+                <div class="glass-panel p-6 rounded-3xl shadow-xl border border-emerald-100 flex flex-wrap justify-between items-center gap-4">
+                    <div>
+                        <span class="text-xs font-bold text-teal-600 bg-teal-50 px-3 py-1 rounded-full uppercase tracking-wider">Panel Administrator</span>
+                        <h2 class="text-2xl font-bold text-slate-900 mt-1">Manajemen Asesmen PTS</h2>
+                        <p class="text-xs text-slate-500">Kelola soal, siswa, logo, uji coba, dan keamanan password</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="adminActionTestExam()" class="px-4 py-2.5 bg-cyan-700 hover:bg-cyan-800 text-white font-bold rounded-xl text-xs transition shadow-md flex items-center gap-2">
+                            <i class="fa-solid fa-laptop-code"></i> Uji Coba Soal (Siswa)
+                        </button>
+                        <button onclick="openAdminSettingsModal()" class="px-4 py-2.5 bg-slate-700 hover:bg-slate-800 text-white font-bold rounded-xl text-xs transition shadow-md flex items-center gap-2">
+                            <i class="fa-solid fa-key"></i> Ganti Password
+                        </button>
+                        <button onclick="openAdminLogoModal()" class="px-4 py-2.5 bg-indigo-700 hover:bg-indigo-800 text-white font-bold rounded-xl text-xs transition shadow-md flex items-center gap-2">
+                            <i class="fa-solid fa-image"></i> Edit Identitas / Logo
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Admin Tabs -->
+                <div class="flex gap-2 border-b border-slate-200 pb-2">
+                    <button onclick="switchAdminTab('soal')" id="adminTabSoalBtn" class="px-5 py-2.5 text-xs font-bold rounded-xl transition bg-emerald-700 text-white shadow-md">
+                        <i class="fa-solid fa-list-check mr-1"></i> Bank Soal (Edit)
+                    </button>
+                    <button onclick="switchAdminTab('nilai')" id="adminTabNilaiBtn" class="px-5 py-2.5 text-xs font-bold rounded-xl transition bg-white text-slate-700 hover:bg-slate-100">
+                        <i class="fa-solid fa-chart-bar mr-1"></i> Rekap Nilai Siswa
+                    </button>
+                </div>
+
+                <!-- TAB CONTENT: SOAL EDIT -->
+                <div id="adminTabSoalContent" class="space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-bold text-slate-800 text-sm">Daftar Soal Asesmen (Total 35 Soal)</h3>
+                        <span class="text-xs text-slate-500">Admin dapat melakukan edit langsung pada butir soal di bawah</span>
+                    </div>
+                    <div id="adminQuestionListContainer" class="space-y-4">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+
+                <!-- TAB CONTENT: REKAP NILAI -->
+                <div id="adminTabNilaiContent" class="space-y-4 hidden">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-bold text-slate-800 text-sm">Rekap Hasil Pengerjaan Siswa</h3>
+                        <button onclick="exportScoresCSV()" class="px-4 py-2 bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-md hover:bg-emerald-800 transition">
+                            <i class="fa-solid fa-file-excel mr-1"></i> Export Rekap
+                        </button>
+                    </div>
+                    <div class="glass-panel p-4 rounded-2xl shadow-md overflow-x-auto border border-emerald-100">
+                        <table class="w-full text-left text-xs">
+                            <thead>
+                                <tr class="border-b border-slate-200 text-slate-500 font-bold bg-slate-50">
+                                    <th class="p-3">No</th>
+                                    <th class="p-3">Nama Siswa</th>
+                                    <th class="p-3">Kelas</th>
+                                    <th class="p-3">No. Presensi</th>
+                                    <th class="p-3">Nilai</th>
+                                    <th class="p-3">Status KKM</th>
+                                    <th class="p-3">Percobaan Ke</th>
+                                    <th class="p-3">Waktu Selesai</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminScoreTableBody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-white/80 border-t border-slate-200 py-3 text-center text-xs text-slate-500">
+            &copy; 2026 MTs. Mu'allimin NU Kota Malang | Penyusun: H. Matwaffi | Penilaian Tengah Semester Bahasa Daerah
+        </footer>
+    </div>
+
+    <!-- MODAL: ADMIN SETTINGS (CHANGE PASSWORD) -->
+    <div id="modalAdminSettings" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="glass-panel w-full max-w-md p-6 rounded-3xl shadow-2xl border border-slate-200 space-y-4 animate-fade">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="font-bold text-slate-900 text-sm"><i class="fa-solid fa-key text-emerald-700 mr-2"></i> Ganti Password Admin</h3>
+                <button onclick="closeModal('modalAdminSettings')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form onsubmit="handleSaveAdminPassword(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Username Baru / Lama</label>
+                    <input type="text" id="settingAdminUser" required class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Password Baru</label>
+                    <input type="password" id="settingAdminPass" required class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs" placeholder="Masukkan password baru">
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeModal('modalAdminSettings')" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-xl text-xs font-bold">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-emerald-700 text-white rounded-xl text-xs font-bold">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ADMIN LOGO / IDENTITY EDIT -->
+    <div id="modalAdminLogo" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="glass-panel w-full max-w-md p-6 rounded-3xl shadow-2xl border border-slate-200 space-y-4 animate-fade">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="font-bold text-slate-900 text-sm"><i class="fa-solid fa-image text-indigo-700 mr-2"></i> Edit Logo & Identitas Madrasah</h3>
+                <button onclick="closeModal('modalAdminLogo')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form onsubmit="handleSaveAdminIdentity(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Nama Madrasah / Sekolah</label>
+                    <input type="text" id="settingSchoolName" required class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">URL Logo / Icon (atau FontAwesome Icon Class)</label>
+                    <input type="text" id="settingSchoolLogo" required class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs" placeholder="Contoh: fa-solid fa-school">
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeModal('modalAdminLogo')" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-xl text-xs font-bold">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-700 text-white rounded-xl text-xs font-bold">Simpan Identitas</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: GENERAL MESSAGE BOX -->
+    <div id="modalMessage" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="glass-panel w-full max-w-sm p-6 rounded-3xl shadow-2xl border border-slate-200 text-center space-y-4 animate-fade">
+            <div id="msgModalIcon" class="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center text-xl text-white"></div>
+            <h3 id="msgModalTitle" class="font-bold text-slate-900 text-base">Informasi</h3>
+            <p id="msgModalText" class="text-xs text-slate-600"></p>
+            <button onclick="closeModal('modalMessage')" class="w-full py-2.5 bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-md hover:bg-emerald-800 transition">Mengerti</button>
+        </div>
+    </div>
+
+    <script>
+        // Default Bank Soal Kelas VIII (35 Soal: 15 PG, 15 PG Kompleks, 5 Menjodohkan)
+        // Materi: Cerita Cekak, Narasi, Aksara Jawa
+        const defaultQuestions = [
+            // --- 15 PILIHAN GANDA (1 - 15) ---
+            {
+                id: 1, type: "pg", materi: "Cerita Cekak",
+                question: "Ing struktur Cerita Cekak (Cerkak), perangan wiwitan crita sing ngenalake paragan, latar, lan kahanan diarani...",
+                options: ["A. Orientasi", "B. Komplikasi", "C. Resolusi", "D. Koda"],
+                answer: 0 // A
+            },
+            {
+                id: 2, type: "pg", materi: "Cerita Cekak",
+                question: "Bédané Cerita Cekak karo crita sambung (novel) yaiku Cerita Cekak biyasane...",
+                options: ["A. Isine ngantiatusan kaca lan rumit", "B. Bisa rampung diwaca ing sakwektu-wektu kanthi ringkes", "C. Ora duwe paragan utawa tokoh", "D. Mung wujud tembang macapat"],
+                answer: 1 // B
+            },
+            {
+                id: 3, type: "pg", materi: "Cerita Cekak",
+                question: "Nalika maca cerkak, kita nemoni punjer masalah utawa karuwetan sing dialami paragan. Perangan iki sinebut...",
+                options: ["A. Orientasi", "B. Komplikasi", "C. Koda", "D. Latar"],
+                answer: 1 // B
+            },
+            {
+                id: 4, type: "pg", materi: "Cerita Cekak",
+                question: "Watak utawa karakter paragan sing asring nulungi kanca lan ora duwe pamrih diarani paragan sing...",
+                options: ["A. Antagonis", "B. Protagonis", "C. Tritagonis", "D. Figuran"],
+                answer: 1 // B
+            },
+            {
+                id: 5, type: "pg", materi: "Cerita Cekak",
+                question: "Pesen moral utawa piwulang luhur sing bisa dijupuk saka cerkak diarani...",
+                options: ["A. Tema", "B. Alur", "C. Amanat", "D. Sudut pandang"],
+                answer: 2 // C
+            },
+            {
+                id: 6, type: "pg", materi: "Narasi",
+                question: "Wacan narasi yaiku jinis wacan sing tujuane...",
+                options: ["A. Njlentrehake prastawa utawa kedadeyan kanthi runtut miturut wektu", "B. Menehi pituduh cara nggawe barang", "C. Ngyakinake wong liya supaya setuju", "D. Mamerake kaendahan alam"],
+                answer: 0 // A
+            },
+            {
+                id: 7, type: "pg", materi: "Narasi",
+                question: "Ing wacan narasi, unsur wektu lan panggonan dadi prekara sing penting supaya...",
+                options: ["A. Pirsawan bingung", "B. Crita kedadeyan krasa nyata lan gampang dingerteni", "C. Wacan dadi dawa tanpa makna", "D. Luwih angel diwaca"],
+                answer: 1 // B
+            },
+            {
+                id: 8, type: "pg", materi: "Narasi",
+                question: "Tuladha wacan narasi ing padinan yaiku...",
+                options: ["A. Lapuran pengalaman pribadi nalika liburan", "B. Resep masak soto", "C. Undhangan resmi", "D. Iklan produk toko"],
+                answer: 0 // A
+            },
+            {
+                id: 9, type: "pg", materi: "Narasi",
+                question: "Jinis narasi sing isine mung arupa rerangken kedadeyan tanpa ana paragan utawa tokoh khusus diarani...",
+                options: ["A. Narasi ekspositoris / informatif", "B. Narasi sugestif", "C. Narasi fiksi", "D. Narasi mitos"],
+                answer: 0 // A
+            },
+            {
+                id: 10, type: "pg", materi: "Narasi",
+                question: "Kepiye urutan kronologis sing bener ing nulis wacan narasi?",
+                options: ["A. Saka pungkasan tumuju wiwitan", "B. Saka wiwitan, tengah, nganti pungkasan prastawa", "C. Sembarang tanpa aturan", "D. Mung ngandharake pungkasane wae"],
+                answer: 1 // B
+            },
+            {
+                id: 11, type: "pg", materi: "Aksara Jawa",
+                question: "Pasangan aksara Jawa sing digunakake kanggo mateni utawa nyigeg swara ing tengah tembung cacahe ana...",
+                options: ["A. 10", "B. 15", "C. 20", "D. 25"],
+                answer: 2 // C (20 pasangan)
+            },
+            {
+                id: 12, type: "pg", materi: "Aksara Jawa",
+                question: "Sandhangan swara sing ngowahi unine aksara dadi 'o' yaiku...",
+                options: ["A. Taling", "B. Taling tarung", "C. Pepet", "D. Suku"],
+                answer: 1 // B
+            },
+            {
+                id: 13, type: "pg", materi: "Aksara Jawa",
+                question: "Aksara murda ing aksara Jawa biyasane digunakake kanggo nulis...",
+                options: ["A. Tembung padinan ing pasar", "B. Jeneng gelar kehormatan utawajeneng wong penting", "C. Angka nomer biasa", "D. Tanda wacan"],
+                answer: 1 // B
+            },
+            {
+                id: 14, type: "pg", materi: "Aksara Jawa",
+                question: "Sandhangan panyigeg wanda sing wujud cecak ing dhuwur aksara digunakake kanggo nulis...",
+                options: ["A. Sigegan 'r'", "B. Sigegan 'h'", "C. Sigegan 'ng'", "D. Sigegan 'pt'"],
+                answer: 2 // C
+            },
+            {
+                id: 15, type: "pg", materi: "Aksara Jawa",
+                question: "Cak-cakan panulisan aksara Jawa sing migunakake angka Jawa biasane diapit nganggo tandha...",
+                options: ["A. Pada lingsa", "B. Pada pangkat", "C. Pada adeg-adeg", "D. Pada lungsi"],
+                answer: 1 // B
+            },
+
+            // --- 15 PILIHAN GANDA KOMPLEKS (16 - 30) ---
+            {
+                id: 16, type: "kompleks", materi: "Cerita Cekak",
+                question: "Pilih kabeh unsur intrinsik sing lumrah ana ing Cerita Cekak (Pilih sing bener):",
+                options: ["A. Tema lan Latar", "B. Alur lan Amanat", "C. Kalkulator ilmiah", "D. Penokohan / Paragan"],
+                answers: [0, 1, 3] // A, B, D
+            },
+            {
+                id: 17, type: "kompleks", materi: "Cerita Cekak",
+                question: "Apa wae ciri-ciri utamane Cerita Cekak? (Pilih sing bener):",
+                options: ["A. Alure mung siji / prasaja", "B. Isine dawa nganti atusan kaca", "C. Paragane diwatesi ora akeh", "D. Biasane rampung diwaca sak lungguhan"],
+                answers: [0, 2, 3] // A, C, D
+            },
+            {
+                id: 18, type: "kompleks", materi: "Cerita Cekak",
+                question: "Kepiye tumindak becik nalika nulis utawa nyemak cerkak? (Pilih sing bener):",
+                options: ["A. Nggatekake pilihan tembung (diksi)", "B. Nglecehake asil karyane kanca", "C. Njupuk piwulang luhur kanggo urip", "D. Nulis kanthi struktur sing bener"],
+                answers: [0, 2, 3] // A, C, D
+            },
+            {
+                id: 19, type: "kompleks", materi: "Cerita Cekak",
+                question: "Latar panggonan sing biyasane digunakake ing cerkak tema sosial yaiku: (Pilih sing bener):",
+                options: ["A. Pasar tradisional", "B. Lingkungan masarakat desa", "C. Sekolah lan kelas", "D. Planet Mars"],
+                answers: [0, 1, 2] // A, B, C
+            },
+            {
+                id: 20, type: "kompleks", materi: "Cerita Cekak",
+                question: "Unsur ekstrinsik sing mengaruhi cerkak kalebu: (Pilih sing bener):",
+                options: ["A. Kahanan masarakat wektu crita ditulis", "B. Latar mburi uripe pangarang", "C. Ukuran kertas sing digunakake", "D. Nilai moral sing ana ing masarakat"],
+                answers: [0, 1, 3] // A, B, D
+            },
+            {
+                id: 21, type: "kompleks", materi: "Narasi",
+                question: "Endi wae sing kalebu jinis wacan narasi? (Pilih sing bener):",
+                options: ["A. Narasi ekspositoris / informatif", "B. Narasi fiksi / suguhan imajinasi", "C. Tabel data statistik murni", "D. Narasi biografis tokoh"],
+                answers: [0, 1, 3] // A, B, D
+            },
+            {
+                id: 22, type: "kompleks", materi: "Narasi",
+                question: "Kapan wacan narasi diarani apik lan runtut? (Pilih sing bener):",
+                options: ["A. Menawa prastawane diandharake kanthi urutan wektu sing cetha", "B. Menawa isine mung ngemot pituduh resep masakan", "C. Menawa paragan lan latar digambarake kanthi urip", "D. Menawa nggunakake basa sing komunikatif"],
+                answers: [0, 2, 3] // A, C, D
+            },
+            {
+                id: 23, type: "kompleks", materi: "Narasi",
+                question: "Apa wae unsur sing asring ana ing wacan narasi? (Pilih sing bener):",
+                options: ["A. Wektu lan panggonan kedadeyan", "B. Prastawa utawa tumindak", "C. Rumus matematika rumit", "D. Tokoh utawa paragan"],
+                answers: [0, 1, 3] // A, B, D
+            },
+            {
+                id: 24, type: "kompleks", materi: "Narasi",
+                question: "Kepiye carane nulis pengalaman dadi wacan narasi sing narik kawigaten? (Pilih sing bener):",
+                options: ["A. Nemtokake tema pengalaman sing bakal ditulis", "B. Ngrancang urutan kedadeyan saka wiwitan nganti rampung", "C. Nggawe crita palsu sing ora ana buktine babar pisan", "D. Nulis migunakake basa sing endah"],
+                answers: [0, 1, 3] // A, B, D
+            },
+            {
+                id: 25, type: "kompleks", materi: "Narasi",
+                question: "Mupangate maca wacan narasi tumrap siswa kelas VIII yaiku: (Pilih sing bener):",
+                options: ["A. Nambah wawasan babagan prastawa utawa pengalaman", "B. Latihan nulis kanthi kronologis", "C. Ngerti cara ngetang angka cepet", "D. Ningkatake katrampilan basa"],
+                answers: [0, 1, 3] // A, B, D
+            },
+            {
+                id: 26, type: "kompleks", materi: "Aksara Jawa",
+                question: "Sandhangan swara ing aksara Jawa cacahe ana lima. Endi wae sing bener? (Pilih sing bener):",
+                options: ["A. Wulu", "B. Suku", "C. Laptop", "D. Pepet"],
+                answers: [0, 1, 3] // A, B, D
+            },
+            {
+                id: 27, type: "kompleks", materi: "Aksara Jawa",
+                question: "Sandhangan panyigeg wanda ing aksara Jawa kalebu: (Pilih sing bener):",
+                options: ["A. Cecak", "B. Layar", "C. Taling tarung", "D. Wignyan"],
+                answers: [0, 1, 3] // A, B, D
+            },
+            {
+                id: 28, type: "kompleks", materi: "Aksara Jawa",
+                question: "Aksara rekan digunakake kanggo nulis apa wae? (Pilih sing bener):",
+                options: ["A. Tembung serapan saka basa manca (kayata Arab)", "B. Tembung asli Jawa kuna", "C. Nulis jeneng utawa istilah khusus", "D. Angka taun jawa"],
+                answers: [0, 2] // A, C
+            },
+            {
+                id: 29, type: "kompleks", materi: "Aksara Jawa",
+                question: "Kepiye aturan panulisan pasangan ing aksara Jawa? (Pilih sing bener):",
+                options: ["A. Pasangan ditulis ing ngisor aksara sing disigeg", "B. Pasangan tartamtu ana sing ditulis ing sangarepe aksara", "C. Kabeh aksara kudu ditulis nganggo huruf kapital", "D. Pasangan nyuda utawa mateni swara aksara sadurunge"],
+                answers: [0, 1, 3] // A, B, D
+            },
+            {
+                id: 30, type: "kompleks", materi: "Aksara Jawa",
+                question: "Aksara sandhangan mandaswara ing aksara Jawa kalebu: (Pilih sing bener):",
+                options: ["A. Cakra (seselan -r-)", "B. Keret (seselan -re-)", "C. Wulu (swara -i-)", "D. Pengkal (seselan -y-)"],
+                answers: [0, 1, 3] // A, B, D
+            },
+
+            // --- 5 MENJODOHKAN (31 - 35) ---
+            {
+                id: 31, type: "jodoh", materi: "Cerita Cekak",
+                question: "Jodohake unsur cerkak ing kiwa karo tegese ing tengen:",
+                pairs: [
+                    { left: "1. Orientasi", right: "Perangan wiwitan ngenalake latar lan paragan" },
+                    { left: "2. Komplikasi", right: "Pucuking masalah utawa karuwetan crita" },
+                    { left: "3. Resolusi", right: "Penyelesaian utawa rintisan mungkasi masalah" }
+                ]
+            },
+            {
+                id: 32, type: "jodoh", materi: "Narasi",
+                question: "Jodohake jinis wacan narasi karo tujuane:",
+                pairs: [
+                    { left: "1. Narasi Ekspositoris", right: "Menehi informasi utawa kawruh marang wong maca" },
+                    { left: "2. Narasi Sugestif", right: "Nimbulake khayalan utawa rasa kasinggihan" },
+                    { left: "3. Narasi Fiksi", right: "Nyritakake kedadeyan khayalan / rekaan" }
+                ]
+            },
+            {
+                id: 33, type: "jodoh", materi: "Aksara Jawa",
+                question: "Jodohake sandhangan swara karo swara sing diasilake:",
+                pairs: [
+                    { left: "1. Wulu", right: "Swara 'i'" },
+                    { left: "2. Suku", right: "Swara 'u'" },
+                    { left: "3. Pepet", right: "Swara 'e' pepet" }
+                ]
+            },
+            {
+                id: 34, type: "jodoh", materi: "Aksara Jawa",
+                question: "Jodohake sandhangan panyigeg wanda karo unine:",
+                pairs: [
+                    { left: "1. Cecak", right: "Mateni swara 'ng'" },
+                    { left: "2. Layar", right: "Mateni swara 'r'" },
+                    { left: "3. Wignyan", right: "Mateni swara 'h'" }
+                ]
+            },
+            {
+                id: 35, type: "jodoh", materi: "Aksara Jawa",
+                question: "Jodohake aksara khusus karo jinise:",
+                pairs: [
+                    { left: "1. Aksara Murda", right: "Kanggo pakurmatan / jeneng penting" },
+                    { left: "2. Aksara Rekan", right: "Kanggo nulis tembung serapan manca" },
+                    { left: "3. Aksara Swara", right: "Aksara urip khusus ing purwaka" }
+                ]
+            }
+        ];
+
+        // Global State
+        let state = {
+            currentUser: null, // { name, kelas, presensi, role: 'siswa'|'admin' }
+            questions: JSON.parse(localStorage.getItem('pts_VIII_questions')) || defaultQuestions,
+            scores: JSON.parse(localStorage.getItem('pts_VIII_scores')) || [],
+            adminAuth: JSON.parse(localStorage.getItem('pts_VIII_admin')) || { user: 'admin', pass: 'muallimin2026' },
+            appIdentity: JSON.parse(localStorage.getItem('pts_VIII_identity')) || { name: "MTs. Mu'allimin NU Kota Malang", logo: "fa-solid fa-graduation-cap" },
+            currentExamIndex: 0,
+            userAnswers: {},
+            examTimerInterval: null,
+            timeRemaining: 90 * 60, // 90 minutes in seconds
+            isTestModeAsSiswa: false
+        };
+
+        // Initialization
+        window.onload = function() {
+            applyIdentity();
+            updateLoginTabUI('siswa');
+        };
+
+        function applyIdentity() {
+            document.getElementById('headerSchoolName').innerText = state.appIdentity.name;
+            const logoContainer = document.getElementById('headerLogoContainer');
+            logoContainer.innerHTML = `<i class="${state.appIdentity.logo}"></i>`;
+        }
+
+        function updateLoginTabUI(role) {
+            switchLoginTab(role);
+        }
+
+        // UI View Switcher
+        function switchView(viewId) {
+            const views = ['viewLogin', 'viewSiswaDashboard', 'viewExamRoom', 'viewExamResult', 'viewAdminDashboard'];
+            views.forEach(id => {
+                const el = document.getElementById(id);
+                if (id === viewId) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+            });
+
+            // Profile Badge in Header
+            const profileBadge = document.getElementById('userProfileBadge');
+            if (state.currentUser) {
+                profileBadge.classList.remove('hidden');
+                document.getElementById('navUserName').innerText = `${state.currentUser.name} (${state.currentUser.role === 'admin' ? 'Admin' : state.currentUser.kelas})`;
+            } else {
+                profileBadge.classList.add('hidden');
+            }
+        }
+
+        // Login Tabs
+        function switchLoginTab(role) {
+            const tabSiswa = document.getElementById('tabSiswa');
+            const tabAdmin = document.getElementById('tabAdmin');
+            const formSiswa = document.getElementById('formSiswa');
+            const formAdmin = document.getElementById('formAdmin');
+
+            if (role === 'siswa') {
+                tabSiswa.className = "flex-1 py-2 text-xs font-bold rounded-lg transition bg-white text-emerald-800 shadow-sm";
+                tabAdmin.className = "flex-1 py-2 text-xs font-bold rounded-lg transition text-slate-600 hover:text-emerald-800";
+                formSiswa.classList.remove('hidden');
+                formAdmin.classList.add('hidden');
+            } else {
+                tabAdmin.className = "flex-1 py-2 text-xs font-bold rounded-lg transition bg-white text-teal-800 shadow-sm";
+                tabSiswa.className = "flex-1 py-2 text-xs font-bold rounded-lg transition text-slate-600 hover:text-teal-800";
+                formAdmin.classList.remove('hidden');
+                formSiswa.classList.add('hidden');
+            }
+        }
+
+        // Handle Login Siswa
+        function handleLoginSiswa(e) {
+            e.preventDefault();
+            const name = document.getElementById('siswaNama').value.trim();
+            const kelas = document.getElementById('siswaKelas').value;
+            const presensi = document.getElementById('siswaPresensi').value.trim();
+
+            if (!name || !kelas || !presensi) {
+                showModalMessage("Peringatan", "Semua kolom identitas siswa wajib diisi!", "warning");
+                return;
+            }
+
+            state.currentUser = {
+                name: name,
+                kelas: kelas,
+                presensi: presensi,
+                role: 'siswa'
+            };
+
+            setupSiswaDashboard();
+            switchView('viewSiswaDashboard');
+        }
+
+        // Handle Login Admin
+        function handleLoginAdmin(e) {
+            e.preventDefault();
+            const user = document.getElementById('adminUser').value.trim();
+            const pass = document.getElementById('adminPass').value.trim();
+
+            if (user === state.adminAuth.user && pass === state.adminAuth.pass) {
+                state.currentUser = {
+                    name: "Administrator / Guru",
+                    role: 'admin'
+                };
+                setupAdminDashboard();
+                switchView('viewAdminDashboard');
+            } else {
+                showModalMessage("Gagal Masuk", "Username atau Password Admin salah!", "error");
+            }
+        }
+
+        function handleLogout() {
+            if (state.examTimerInterval) clearInterval(state.examTimerInterval);
+            state.currentUser = null;
+            state.isTestModeAsSiswa = false;
+            switchView('viewLogin');
+            document.getElementById('formSiswa').reset();
+            document.getElementById('formAdmin').reset();
+        }
+
+        // Siswa Dashboard Setup
+        function setupSiswaDashboard() {
+            document.getElementById('welcomeSiswaName').innerText = state.currentUser.name;
+            document.getElementById('welcomeSiswaKelas').innerText = state.currentUser.kelas;
+            document.getElementById('welcomeSiswaPresensi').innerText = state.currentUser.presensi;
+
+            const studentAttempts = state.scores.filter(s => s.name.toLowerCase() === state.currentUser.name.toLowerCase() && s.presensi === state.currentUser.presensi);
+            const count = studentAttempts.length;
+            document.getElementById('currentAttemptCount').innerText = count;
+
+            const lastScore = count > 0 ? studentAttempts[count - 1].score : null;
+            const lastScoreDisplay = document.getElementById('lastScoreDisplay');
+            if (lastScore !== null) {
+                lastScoreDisplay.innerHTML = `Nilai Terakhir: <span class="${lastScore >= 80 ? 'text-emerald-700' : 'text-red-600'}">${lastScore}</span>`;
+            } else {
+                lastScoreDisplay.innerHTML = `Belum pernah mengerjakan`;
+            }
+
+            const btnMulai = document.getElementById('btnMulaiUjian');
+            if (count >= 3 && !state.isTestModeAsSiswa) {
+                btnMulai.disabled = true;
+                btnMulai.className = "flex-1 py-3.5 bg-slate-300 text-slate-500 font-bold rounded-2xl cursor-not-allowed text-sm flex items-center justify-center gap-2";
+                btnMulai.innerHTML = `<i class="fa-solid fa-ban"></i> Batas Kesempatan Telah Habis (3x)`;
+            } else {
+                btnMulai.disabled = false;
+                btnMulai.className = "flex-1 py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-2xl transition shadow-lg shadow-emerald-700/20 text-sm flex items-center justify-center gap-2";
+                btnMulai.innerHTML = `<i class="fa-solid fa-play"></i> Mulai Mengerjakan Soal`;
+            }
+        }
+
+        // Start Exam
+        function startExam() {
+            state.currentExamIndex = 0;
+            state.userAnswers = {};
+            state.timeRemaining = 90 * 60; // 90 minutes
+            switchView('viewExamRoom');
+            renderQuestion();
+            startExamTimer();
+        }
+
+        function startExamTimer() {
+            if (state.examTimerInterval) clearInterval(state.examTimerInterval);
+            state.examTimerInterval = setInterval(() => {
+                state.timeRemaining--;
+                const min = Math.floor(state.timeRemaining / 60);
+                const sec = state.timeRemaining % 60;
+                document.getElementById('examTimer').innerText = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+
+                if (state.timeRemaining <= 0) {
+                    clearInterval(state.examTimerInterval);
+                    showModalMessage("Waktu Habis", "Waktu pengerjaan PTS telah habis! Sistem akan otomatis mengumpulkan jawaban Anda.", "warning");
+                    submitExam();
+                }
+            }, 1000);
+        }
+
+        function renderQuestion() {
+            const q = state.questions[state.currentExamIndex];
+            document.getElementById('currentQuestionNum').innerText = state.currentExamIndex + 1;
+            
+            let typeTag = "Pilihan Ganda";
+            if (q.type === 'kompleks') typeTag = "Pilihan Ganda Kompleks (Bisa pilih > 1)";
+            if (q.type === 'jodoh') typeTag = "Menjodohkan Pasangan";
+            document.getElementById('currentQuestionTypeTag').innerText = `${q.materi} — ${typeTag}`;
+
+            const container = document.getElementById('questionContainer');
+            let html = `
+                <div class="text-xs font-bold text-emerald-700 uppercase tracking-wide">Materi: ${q.materi}</div>
+                <div class="text-base font-semibold text-slate-900 leading-relaxed">${q.question}</div>
+            `;
+
+            if (q.type === 'pg') {
+                html += `<div class="space-y-3 pt-2">`;
+                q.options.forEach((opt, idx) => {
+                    const isChecked = state.userAnswers[state.currentExamIndex] === idx ? 'checked' : '';
+                    const borderClass = isChecked ? 'border-emerald-500 bg-emerald-50/50 text-emerald-900 font-semibold' : 'border-slate-200 hover:border-slate-300 text-slate-700';
+                    html += `
+                        <label class="flex items-center gap-3 p-4 rounded-2xl border ${borderClass} cursor-pointer transition">
+                            <input type="radio" name="answer_pg" value="${idx}" ${isChecked} onchange="saveAnswer(${idx})" class="w-4 h-4 text-emerald-600 focus:ring-emerald-500">
+                            <span class="text-sm">${opt}</span>
+                        </label>
+                    `;
+                });
+                html += `</div>`;
+            } else if (q.type === 'kompleks') {
+                html += `<div class="text-xs text-slate-500 italic mb-2"><i class="fa-solid fa-circle-info mr-1"></i> Centang semua jawaban yang Anda anggap benar (lebih dari satu).</div><div class="space-y-3 pt-2">`;
+                const savedArr = state.userAnswers[state.currentExamIndex] || [];
+                q.options.forEach((opt, idx) => {
+                    const isChecked = savedArr.includes(idx) ? 'checked' : '';
+                    html += `
+                        <label class="flex items-center gap-3 p-4 rounded-2xl border border-slate-200 hover:border-slate-300 text-slate-700 cursor-pointer transition">
+                            <input type="checkbox" value="${idx}" ${isChecked} onchange="saveAnswerKompleks(${idx}, this.checked)" class="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500">
+                            <span class="text-sm">${opt}</span>
+                        </label>
+                    `;
+                });
+                html += `</div>`;
+            } else if (q.type === 'jodoh') {
+                html += `<div class="space-y-4 pt-2">`;
+                const savedJodoh = state.userAnswers[state.currentExamIndex] || {};
+                q.pairs.forEach((pair, pIdx) => {
+                    html += `
+                        <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2">
+                            <div class="text-xs font-bold text-slate-800">${pair.left}</div>
+                            <select onchange="saveAnswerJodoh(${pIdx}, this.value)" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white">
+                                <option value="">-- Pilih Jodoh yang Sesuai --</option>
+                    `;
+                    q.pairs.forEach((optPair, oIdx) => {
+                        const selected = savedJodoh[pIdx] == oIdx ? 'selected' : '';
+                        html += `<option value="${oIdx}" ${selected}>${optPair.right}</option>`;
+                    });
+                    html += `</select></div>`;
+                });
+                html += `</div>`;
+            }
+
+            container.innerHTML = html;
+            renderPaginationDots();
+
+            document.getElementById('btnPrev').disabled = state.currentExamIndex === 0;
+            const btnNext = document.getElementById('btnNext');
+            if (state.currentExamIndex === state.questions.length - 1) {
+                btnNext.innerHTML = `Selesai & Kumpulkan <i class="fa-solid fa-check ml-1"></i>`;
+                btnNext.className = "px-5 py-2.5 rounded-xl bg-teal-700 text-white hover:bg-teal-800 text-xs font-bold transition shadow-md shadow-teal-700/20";
+                btnNext.setAttribute('onclick', 'confirmSubmitExam()');
+            } else {
+                btnNext.innerHTML = `Selanjutnya <i class="fa-solid fa-chevron-right ml-1"></i>`;
+                btnNext.className = "px-5 py-2.5 rounded-xl bg-emerald-700 text-white hover:bg-emerald-800 text-xs font-bold transition shadow-md shadow-emerald-700/20";
+                btnNext.setAttribute('onclick', 'navigateQuestion(1)');
+            }
+        }
+
+        function renderPaginationDots() {
+            const paginationContainer = document.getElementById('questionNumberPagination');
+            let html = '';
+            for (let i = 0; i < state.questions.length; i++) {
+                const isCurrent = i === state.currentExamIndex;
+                const isAnswered = state.userAnswers[i] !== undefined && Object.keys(state.userAnswers[i]).length > 0;
+                let btnClass = "w-8 h-8 rounded-xl text-xs font-bold transition flex items-center justify-center ";
+                if (isCurrent) {
+                    btnClass += "bg-emerald-800 text-white shadow-md";
+                } else if (isAnswered) {
+                    btnClass += "bg-emerald-100 text-emerald-800 border border-emerald-300";
+                } else {
+                    btnClass += "bg-slate-100 text-slate-600 hover:bg-slate-200";
+                }
+                html += `<button onclick="jumpToQuestion(${i})" class="${btnClass}">${i + 1}</button>`;
+            }
+            paginationContainer.innerHTML = html;
+        }
+
+        function saveAnswer(val) {
+            state.userAnswers[state.currentExamIndex] = val;
+            renderPaginationDots();
+        }
+
+        function saveAnswerKompleks(optIdx, isChecked) {
+            if (!state.userAnswers[state.currentExamIndex]) {
+                state.userAnswers[state.currentExamIndex] = [];
+            }
+            let arr = state.userAnswers[state.currentExamIndex];
+            if (isChecked) {
+                if (!arr.includes(optIdx)) arr.push(optIdx);
+            } else {
+                state.userAnswers[state.currentExamIndex] = arr.filter(item => item !== optIdx);
+            }
+            renderPaginationDots();
+        }
+
+        function saveAnswerJodoh(pairIdx, val) {
+            if (!state.userAnswers[state.currentExamIndex]) {
+                state.userAnswers[state.currentExamIndex] = {};
+            }
+            state.userAnswers[state.currentExamIndex][pairIdx] = val;
+            renderPaginationDots();
+        }
+
+        function navigateQuestion(direction) {
+            const newIndex = state.currentExamIndex + direction;
+            if (newIndex >= 0 && newIndex < state.questions.length) {
+                state.currentExamIndex = newIndex;
+                renderQuestion();
+            }
+        }
+
+        function jumpToQuestion(idx) {
+            state.currentExamIndex = idx;
+            renderQuestion();
+        }
+
+        function confirmSubmitExam() {
+            if (confirm("Apakah Anda yakin ingin menyelesaikan dan mengumpulkan jawaban ujian ini?")) {
+                submitExam();
+            }
+        }
+
+        function submitExam() {
+            if (state.examTimerInterval) clearInterval(state.examTimerInterval);
+
+            let totalScore = 0;
+            const totalQuestions = state.questions.length;
+            const pointsPerQuestion = 100 / totalQuestions;
+
+            state.questions.forEach((q, idx) => {
+                const userAns = state.userAnswers[idx];
+                if (userAns !== undefined) {
+                    if (q.type === 'pg') {
+                        if (userAns === q.answer) {
+                            totalScore += pointsPerQuestion;
+                        }
+                    } else if (q.type === 'kompleks') {
+                        const correctSet = new Set(q.answers);
+                        const userSet = new Set(userAns);
+                        if (correctSet.size === userSet.size && [...correctSet].every(val => userSet.has(val))) {
+                            totalScore += pointsPerQuestion;
+                        }
+                    } else if (q.type === 'jodoh') {
+                        let allCorrect = true;
+                        q.pairs.forEach((p, pIdx) => {
+                            if (userAns[pIdx] != pIdx) allCorrect = false;
+                        });
+                        if (allCorrect && Object.keys(userAns).length === q.pairs.length) {
+                            totalScore += pointsPerQuestion;
+                        }
+                    }
+                }
+            });
+
+            const finalScore = Math.round(totalScore);
+
+            if (!state.isTestModeAsSiswa) {
+                const studentAttempts = state.scores.filter(s => s.name.toLowerCase() === state.currentUser.name.toLowerCase() && s.presensi === state.currentUser.presensi);
+                const attemptNo = studentAttempts.length + 1;
+
+                const scoreRecord = {
+                    name: state.currentUser.name,
+                    kelas: state.currentUser.kelas,
+                    presensi: state.currentUser.presensi,
+                    score: finalScore,
+                    attempt: attemptNo,
+                    timestamp: new Date().toLocaleString('id-ID')
+                };
+                state.scores.push(scoreRecord);
+                localStorage.setItem('pts_VIII_scores', JSON.stringify(state.scores));
+            }
+
+            renderResultView(finalScore);
+            switchView('viewExamResult');
+        }
+
+        function renderResultView(score) {
+            const isPassed = score >= 80;
+            const iconEl = document.getElementById('resultIcon');
+            const statusEl = document.getElementById('resStatus');
+            
+            document.getElementById('resFinalScore').innerText = score;
+            document.getElementById('resultSubtitle').innerText = `Siswa: ${state.currentUser.name} (${state.currentUser.kelas})`;
+
+            if (isPassed) {
+                iconEl.className = "w-20 h-20 rounded-3xl mx-auto flex items-center justify-center text-3xl shadow-lg bg-emerald-100 text-emerald-700";
+                iconEl.innerHTML = `<i class="fa-solid fa-award"></i>`;
+                statusEl.innerHTML = `<span class="text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200">LULUS (KKM ≥ 80)</span>`;
+            } else {
+                iconEl.className = "w-20 h-20 rounded-3xl mx-auto flex items-center justify-center text-3xl shadow-lg bg-amber-100 text-amber-700";
+                iconEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i>`;
+                statusEl.innerHTML = `<span class="text-amber-700 bg-amber-50 px-3 py-1.5 rounded-full border border-amber-200">BELUM LULUS (KKM < 80)</span>`;
+            }
+        }
+
+        function returnToDashboard() {
+            if (state.isTestModeAsSiswa) {
+                state.isTestModeAsSiswa = false;
+                state.currentUser = { name: "Administrator / Guru", role: 'admin' };
+                setupAdminDashboard();
+                switchView('viewAdminDashboard');
+            } else {
+                setupSiswaDashboard();
+                switchView('viewSiswaDashboard');
+            }
+        }
+
+        function downloadPDFCertificate() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setFillColor(16, 185, 129);
+            doc.rect(0, 0, 210, 40, 'F');
+            
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(16);
+            doc.text("MTs. MU'ALLIMIN NU KOTA MALANG", 105, 18, { align: 'center' });
+            doc.setFontSize(10);
+            doc.text("SERTIFIKAT HASIL PENILAIAN TENGAH SEMESTER (PTS) KELAS VIII", 105, 28, { align: 'center' });
+
+            doc.setTextColor(30, 41, 59);
+            doc.setFontSize(12);
+            doc.text("Diberikan kepada:", 20, 60);
+
+            doc.setFontSize(16);
+            doc.setFont(undefined, 'bold');
+            doc.text(state.currentUser.name, 20, 70);
+
+            doc.setFont(undefined, 'normal');
+            doc.setFontSize(11);
+            doc.text(`Kelas: ${state.currentUser.kelas}`, 20, 80);
+            doc.text(`Nomor Presensi: ${state.currentUser.presensi}`, 20, 88);
+            doc.text(`Penyusun Soal: H. Matwaffi`, 20, 96);
+
+            const lastRecord = state.scores.filter(s => s.name === state.currentUser.name).pop();
+            const scoreVal = lastRecord ? lastRecord.score : 0;
+
+            doc.setDrawColor(16, 185, 129);
+            doc.roundedRect(20, 110, 170, 40, 3, 3);
+            doc.setFontSize(12);
+            doc.text("NILAI AKHIR PTS:", 30, 127);
+            doc.setFontSize(24);
+            doc.setFont(undefined, 'bold');
+            doc.setTextColor(16, 185, 129);
+            doc.text(`${scoreVal}`, 150, 132, { align: 'right' });
+
+            doc.setFontSize(10);
+            doc.setFont(undefined, 'normal');
+            doc.setTextColor(100, 116, 139);
+            doc.text(`KKM Standar: 80 | Status: ${scoreVal >= 80 ? 'LULUS' : 'TIDAK LULUS'}`, 30, 142);
+
+            doc.text(`Dicetak otomatis dari Sistem Asesmen Digital pada ${new Date().toLocaleString('id-ID')}`, 105, 180, { align: 'center' });
+
+            doc.save(`Sertifikat_PTS_Kelas_VIII_${state.currentUser.name.replace(/\s+/g, '_')}.pdf`);
+        }
+
+        // --- ADMIN DASHBOARD LOGIC ---
+        function setupAdminDashboard() {
+            renderAdminQuestionList();
+            renderAdminScoreTable();
+        }
+
+        function switchAdminTab(tabName) {
+            const tabSoalBtn = document.getElementById('adminTabSoalBtn');
+            const tabNilaiBtn = document.getElementById('adminTabNilaiBtn');
+            const tabSoalContent = document.getElementById('adminTabSoalContent');
+            const tabNilaiContent = document.getElementById('adminTabNilaiContent');
+
+            if (tabName === 'soal') {
+                tabSoalBtn.className = "px-5 py-2.5 text-xs font-bold rounded-xl transition bg-emerald-700 text-white shadow-md";
+                tabNilaiBtn.className = "px-5 py-2.5 text-xs font-bold rounded-xl transition bg-white text-slate-700 hover:bg-slate-100";
+                tabSoalContent.classList.remove('hidden');
+                tabNilaiContent.classList.add('hidden');
+            } else {
+                tabNilaiBtn.className = "px-5 py-2.5 text-xs font-bold rounded-xl transition bg-emerald-700 text-white shadow-md";
+                tabSoalBtn.className = "px-5 py-2.5 text-xs font-bold rounded-xl transition bg-white text-slate-700 hover:bg-slate-100";
+                tabNilaiContent.classList.remove('hidden');
+                tabSoalContent.classList.add('hidden');
+                renderAdminScoreTable();
+            }
+        }
+
+        function renderAdminQuestionList() {
+            const container = document.getElementById('adminQuestionListContainer');
+            let html = '';
+            state.questions.forEach((q, idx) => {
+                html += `
+                    <div class="glass-panel p-5 rounded-2xl border border-slate-200 space-y-3 shadow-sm">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full">Soal No. ${idx + 1} (${q.type.toUpperCase()})</span>
+                            <span class="text-xs text-slate-500">${q.materi}</span>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Pertanyaan:</label>
+                            <input type="text" id="admin_q_${idx}" value="${q.question}" onchange="updateQuestionText(${idx}, this.value)" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white">
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function updateQuestionText(idx, val) {
+            state.questions[idx].question = val;
+            localStorage.setItem('pts_VIII_questions', JSON.stringify(state.questions));
+        }
+
+        function renderAdminScoreTable() {
+            const tbody = document.getElementById('adminScoreTableBody');
+            if (state.scores.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-400">Belum ada siswa yang mengerjakan asesmen.</td></tr>`;
+                return;
+            }
+            let html = '';
+            state.scores.forEach((s, idx) => {
+                const isPass = s.score >= 80;
+                html += `
+                    <tr class="border-b border-slate-100 hover:bg-slate-50/50">
+                        <td class="p-3 font-semibold">${idx + 1}</td>
+                        <td class="p-3 font-bold text-slate-900">${s.name}</td>
+                        <td class="p-3">${s.kelas}</td>
+                        <td class="p-3">${s.presensi}</td>
+                        <td class="p-3 font-bold ${isPass ? 'text-emerald-700' : 'text-red-600'}">${s.score}</td>
+                        <td class="p-3"><span class="px-2 py-1 rounded-md text-[10px] font-bold ${isPass ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'}">${isPass ? 'Lulus' : 'Belum Lulus'}</span></td>
+                        <td class="p-3">Ke-${s.attempt}</td>
+                        <td class="p-3 text-slate-500">${s.timestamp}</td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        }
+
+        function exportScoresCSV() {
+            if (state.scores.length === 0) {
+                showModalMessage("Kosong", "Belum ada data nilai untuk diexport.", "warning");
+                return;
+            }
+            let csv = "No,Nama Siswa,Kelas,No Presensi,Nilai,Status,Percobaan Ke,Waktu\n";
+            state.scores.forEach((s, i) => {
+                csv += `${i+1},"${s.name}",${s.kelas},${s.presensi},${s.score},${s.score >= 80 ? 'Lulus' : 'Belum Lulus'},${s.attempt},"${s.timestamp}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Rekap_Nilai_PTS_Kelas_VIII.csv`;
+            a.click();
+        }
+
+        function adminActionTestExam() {
+            state.currentUser = {
+                name: "Uji Coba Guru / Admin",
+                kelas: "VII A",
+                presensi: "99",
+                role: 'siswa'
+            };
+            state.isTestModeAsSiswa = true;
+            startExam();
+        }
+
+        function openAdminSettingsModal() {
+            document.getElementById('settingAdminUser').value = state.adminAuth.user;
+            document.getElementById('settingAdminPass').value = state.adminAuth.pass;
+            document.getElementById('modalAdminSettings').classList.remove('hidden');
+        }
+
+        function handleSaveAdminPassword(e) {
+            e.preventDefault();
+            const u = document.getElementById('settingAdminUser').value.trim();
+            const p = document.getElementById('settingAdminPass').value.trim();
+            state.adminAuth = { user: u, pass: p };
+            localStorage.setItem('pts_VIII_admin', JSON.stringify(state.adminAuth));
+            closeModal('modalAdminSettings');
+            showModalMessage("Berhasil", "Password dan Username Admin berhasil diperbarui!", "success");
+        }
+
+        function openAdminLogoModal() {
+            document.getElementById('settingSchoolName').value = state.appIdentity.name;
+            document.getElementById('settingSchoolLogo').value = state.appIdentity.logo;
+            document.getElementById('modalAdminLogo').classList.remove('hidden');
+        }
+
+        function handleSaveAdminIdentity(e) {
+            e.preventDefault();
+            const name = document.getElementById('settingSchoolName').value.trim();
+            const logo = document.getElementById('settingSchoolLogo').value.trim();
+            state.appIdentity = { name: name, logo: logo };
+            localStorage.setItem('pts_VIII_identity', JSON.stringify(state.appIdentity));
+            applyIdentity();
+            closeModal('modalAdminLogo');
+            showModalMessage("Berhasil", "Identitas madrasah berhasil diperbarui!", "success");
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        function showModalMessage(title, text, type) {
+            const modal = document.getElementById('modalMessage');
+            document.getElementById('msgModalTitle').innerText = title;
+            document.getElementById('msgModalText').innerText = text;
+            const iconEl = document.getElementById('msgModalIcon');
+            
+            if (type === 'success') {
+                iconEl.className = "w-12 h-12 rounded-2xl mx-auto flex items-center justify-center text-xl text-white bg-emerald-600";
+                iconEl.innerHTML = `<i class="fa-solid fa-check"></i>`;
+            } else if (type === 'warning') {
+                iconEl.className = "w-12 h-12 rounded-2xl mx-auto flex items-center justify-center text-xl text-white bg-amber-600";
+                iconEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i>`;
+            } else {
+                iconEl.className = "w-12 h-12 rounded-2xl mx-auto flex items-center justify-center text-xl text-white bg-red-600";
+                iconEl.innerHTML = `<i class="fa-solid fa-xmark"></i>`;
+            }
+            modal.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
